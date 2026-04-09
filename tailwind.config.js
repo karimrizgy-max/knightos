@@ -5,6 +5,25 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    'chess-darker',
+    'chess-dark',
+    'chess-light',
+    'chess-accent',
+    'chess-accent-dark',
+    'bg-chess-darker',
+    'from-chess-darker',
+    'via-chess-dark',
+    'to-black',
+    'text-chess-darker',
+    'bg-chess-accent',
+    'text-chess-accent',
+    'border-chess-accent',
+    'hover:bg-chess-accent',
+    'hover:text-chess-darker',
+    'from-chess-accent',
+    'to-chess-accent-dark',
+  ],
   theme: {
     extend: {
       colors: {
