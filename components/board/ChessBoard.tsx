@@ -29,7 +29,7 @@ const ChessPiece: React.FC<ChessPieceProps> = ({ piece, position, onMove }) => {
 
   return (
     <div
-      ref={drag}
+      ref={(node) => drag(node)}
       className={`
         w-full h-full flex items-center justify-center text-4xl cursor-grab select-none
         transition-all duration-200 hover:scale-110
