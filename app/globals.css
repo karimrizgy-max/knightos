@@ -1,3 +1,68 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-chess;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-chess-darker;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-chess-accent to-chess-accent-dark text-chess-darker px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-chess-accent/25 transition-all duration-200 transform hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-chess-accent text-chess-accent px-6 py-3 rounded-lg font-semibold hover:bg-chess-accent hover:text-chess-darker transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-gradient-to-br from-chess-light to-chess-dark p-6 rounded-xl border border-chess-light/20 hover:border-chess-accent/50 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-chess-accent/10;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-chess-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-chess-accent rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-chess-accent-dark;
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-chess-accent text-chess-darker;
+}
+
+/* Focus styles */
+.focus-ring:focus {
+  @apply outline-none ring-2 ring-chess-accent ring-opacity-50;
+}
