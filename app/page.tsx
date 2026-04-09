@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import ChessBoard from '../components/board/ChessBoard'
 
+// Force redeploy - v1.1
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-chess-darker via-chess-dark to-black text-white overflow-x-hidden">
