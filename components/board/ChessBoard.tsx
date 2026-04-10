@@ -1,46 +1,98 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Chess } from 'chess.js';
 
+export interface ChessBoardProps {
+  game?: Chess;
+  selectedSquare?: string | null;
+  possibleMoves?: string[];
+  onSquareClick?: (square: string) => void;
+  lastMove?: { from: string; to: string } | null;
+  showCoords?: boolean;
+  className?: string;
+  onReset?: () => void;
+}
+
 const pieceSymbols: { [key: string]: string } = {
-  'p': 'p', 'n': 'n', 'b': 'b', 'r': 'r', 'q': 'q', 'k': 'k',
-  'P': 'P', 'N': 'N', 'B': 'B', 'R': 'R', 'Q': 'Q', 'K': 'K'
+  p: '♟',
+  n: '♞',
+  b: '♝',
+  r: '♜',
+  q: '♛',
+  k: '♚',
+  P: '♙',
+  N: '♘',
+  B: '♗',
+  R: '♖',
+  Q: '♕',
+  K: '♔',
 };
 
-const ChessBoard: React.FC = () => {
-  const [game, setGame] = useState(new Chess());
-  const [selected, setSelected] = useState<string | null>(null);
-  const [highlighted, setHighlighted] = useState<string[]>([]);
+const ChessBoard: React.FC<ChessBoardProps> = ({
+  game: controlledGame,
+  selectedSquare,
+  possibleMoves,
+  onSquareClick,
+  lastMove,
+  showCoords = true,
+  className = '',
+  onReset,
+}) => {
+  const [internalGame, setInternalGame] = useState<Chess>(() => new Chess());
+  const [localSelected, setLocalSelected] = useState<string | null>(null);
+  const [localMoves, setLocalMoves] = useState<string[]>([]);
+
+  const isControlled = Boolean(controlledGame && onSquareClick);
+  const game = controlledGame ?? internalGame;
+  const selected = selectedSquare ?? localSelected;
+  const highlighted = possibleMoves ?? localMoves;
+
+  useEffect(() => {
+    if (!isControlled) return;
+    setLocalSelected(null);
+    setLocalMoves([]);
+  }, [controlledGame, isControlled]);
 
   const handleClick = (position: string) => {
-    if (selected) {
+    if (isControlled && onSquareClick) {
+      onSquareClick(position);
+      return;
+    }
+
+    const moves = game.moves({ square: position, verbose: true });
+    if (selected && highlighted.includes(position)) {
       try {
         const move = game.move({ from: selected, to: position, promotion: 'q' });
         if (move) {
-          setGame(new Chess(game.fen()));
-          setSelected(null);
-          setHighlighted([]);
+          setInternalGame(new Chess(game.fen()));
+          setLocalSelected(null);
+          setLocalMoves([]);
           return;
         }
-      } catch {}
-      setSelected(null);
-      setHighlighted([]);
-    } else {
-      const moves = game.moves({ square: position, verbose: true });
-      if (moves.length > 0) {
-        setSelected(position);
-        setHighlighted(moves.map((m: any) => m.to));
+      } catch {
+        // invalid move
       }
+      setLocalSelected(null);
+      setLocalMoves([]);
+      return;
+    }
+
+    if (moves.length > 0) {
+      setLocalSelected(position);
+      setLocalMoves(moves.map((m: any) => m.to));
+    } else {
+      setLocalSelected(null);
+      setLocalMoves([]);
     }
   };
 
-  const board = game.board();
+  const board = useMemo(() => game.board(), [game]);
 
   return (
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:16}}>
-      <div style={{padding:16,background:'#b58863',borderRadius:8}}>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(8,64px)'}}>
+    <div className={`flex flex-col items-center gap-4 ${className}`}>
+      <div className="bg-gradient-to-br from-amber-900 to-amber-700 p-4 rounded-3xl shadow-2xl border border-amber-600/60">
+        <div className="grid grid-cols-8 gap-0 rounded-xl overflow-hidden border-2 border-transparent">
           {board.map((row, rowIndex) =>
             row.map((square, colIndex) => {
               const position = String.fromCharCode(97 + colIndex) + (8 - rowIndex);
@@ -48,20 +100,46 @@ const ChessBoard: React.FC = () => {
               const isLight = (rowIndex + colIndex) % 2 === 0;
               const isSelected = selected === position;
               const isHighlighted = highlighted.includes(position);
+              const isLast = lastMove?.from === position || lastMove?.to === position;
+
               return (
-                <div key={position} onClick={() => handleClick(position)}
-                  style={{width:64,height:64,background:isSelected?'#f6f669':isHighlighted?'#cdd16a':isLight?'#f0d9b5':'#b58863',display:'flex',alignItems:'center',justifyContent:'center',fontSize:40,cursor:'pointer'}}>
-                  {piece || ''}
-                </div>
+                <button
+                  key={position}
+                  type="button"
+                  onClick={() => handleClick(position)}
+                  className={`w-14 h-14 md:w-16 md:h-16 flex items-center justify-center relative transition-all duration-200 focus:outline-none ${
+                    isLight ? 'bg-amber-100' : 'bg-amber-800'
+                  } ${isSelected ? 'ring-4 ring-yellow-400 ring-inset' : ''} ${
+                    isHighlighted ? 'ring-4 ring-green-400 ring-inset' : ''
+                  } ${isLast ? 'ring-2 ring-blue-400 ring-inset' : ''} hover:opacity-90`}
+                >
+                  {piece ? (
+                    <span className={`text-3xl md:text-4xl ${square.color === 'w' ? 'text-white' : 'text-gray-900'}`}>
+                      {pieceSymbols[piece]}
+                    </span>
+                  ) : isHighlighted ? (
+                    <span className="w-2 h-2 rounded-full bg-green-400 opacity-80" />
+                  ) : null}
+                  {showCoords && (
+                    <span className="pointer-events-none absolute bottom-1 right-1 text-[10px] text-neutral-500">
+                      {position}
+                    </span>
+                  )}
+                </button>
               );
             })
           )}
         </div>
       </div>
-      <button onClick={() => {setGame(new Chess());setSelected(null);setHighlighted([]);}}
-        style={{padding:'8px 24px',background:'#b58863',color:'white',borderRadius:8,border:'none',cursor:'pointer'}}>
-        New Game
-      </button>
+      {!isControlled && onReset && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium transition-colors duration-200"
+        >
+          New Game
+        </button>
+      )}
     </div>
   );
 };

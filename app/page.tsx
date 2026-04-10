@@ -19,11 +19,9 @@ export default function Home() {
               </span>
             </div>
             <div className="hidden md:flex space-x-8">
-              <Link href="#features" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Features</Link>
-              <Link href="#about" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">About</Link>
-              <Link href="#pricing" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Pricing</Link>
-            </div>
-            <div className="flex space-x-4">
+              <Link href="/play" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Play</Link>
+              <Link href="/coach" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Coach</Link>
+              <Link href="/puzzles" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Puzzles</Link>
               <Link href="/login" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Login</Link>
               <Link
                 href="/register"
@@ -31,6 +29,10 @@ export default function Home() {
               >
                 Sign Up
               </Link>
+            </div>
+            <div className="flex md:hidden space-x-4">
+              <Link href="/play" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Play</Link>
+              <Link href="/coach" className="text-gray-300 hover:text-chess-accent transition-colors duration-200">Coach</Link>
             </div>
           </div>
         </div>
